@@ -81,7 +81,8 @@ extern int yydebug;
     PLUS = 282,                    /* PLUS  */
     MINUS = 283,                   /* MINUS  */
     MUL = 284,                     /* MUL  */
-    DIV = 285                      /* DIV  */
+    DIV = 285,                     /* DIV  */
+    UMINUS = 286                   /* UMINUS  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -90,13 +91,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 12 "parser.y"
+#line 24 "parser.y"
 
     int ival;
-    char* sval;
+    char* sval; // For identifiers (strdup'd in lexer, remember to free in parser actions or AST destructor)
     struct ASTNode* node;
 
-#line 100 "parser.tab.hpp"
+#line 101 "parser.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

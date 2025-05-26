@@ -2,6 +2,9 @@
 #include <string>
 #include <iostream> // For std::cout in printAST
 #include <cstdio>   // For fprintf, fflush (used for error messages)
+#include <vector> 
+
+// --- Node Creation Helpers ---
 
 ASTNode* createNumNode(int val) {
     return new ASTNode("num", std::to_string(val));
@@ -17,7 +20,7 @@ ASTNode* createIdNode(char* name) {
 }
 
 ASTNode* createOpNode(const std::string& op, ASTNode* l, ASTNode* r) {
-    return new ASTNode("op", op, l, r);
+    return new ASTNode("op", op, l, r); // Handles +, -, *, /, <, >, ==, ++, -- etc.
 }
 
 ASTNode* createAssignNode(char* name, ASTNode* expr) {
@@ -53,22 +56,34 @@ ASTNode* createNode(const std::string& type, ASTNode* left, ASTNode* right) {
     return new ASTNode(type, "", left, right);
 }
 
-void printAST(ASTNode* root, int indent) {
-    if (!root) return;
-    for (int i = 0; i < indent; ++i) std::cout << "  "; 
-    std::cout << root->type;
-    if (!root->value.empty()) {
-        if (root->value != "<ERROR_NULL_ID_NAME>" && root->value != "<ERROR_NULL_ASSIGN_ID>") {
-            std::cout << "(" << root->value << ")";
-        } else {
-            std::cout << "[" << root->value << "]"; 
-        }
+// --- AST Printing ---
+
+void printAST(ASTNode* node, const std::string& prefix, bool isLast) {
+    if (!node) return;
+
+    std::cout << prefix << (isLast ? "└── " : "├── ")
+              << node->type;
+    if (!node->value.empty()) {
+        std::cout << "(" << node->value << ")";
     }
-    std::cout << "\n";
-    
-    printAST(root->left, indent + 1);
-    printAST(root->right, indent + 1);
-    printAST(root->third, indent + 1);
-    printAST(root->fourth, indent + 1); 
+    std::cout << std::endl;
+
+    std::string newPrefix = prefix + (isLast ? "    " : "│   ");
+    std::vector<ASTNode*> children;
+    if (node->left) children.push_back(node->left);
+    if (node->right) children.push_back(node->right);
+    if (node->third) children.push_back(node->third);
+    if (node->fourth) children.push_back(node->fourth);
+
+    for (size_t i = 0; i < children.size(); ++i) {
+        printAST(children[i], newPrefix, i == children.size() - 1);
+    }
 }
+
+// --- Compatibility wrapper ---
+void printAST(ASTNode* node, int indent) {
+    std::string prefix(indent * 2, ' ');
+    printAST(node, prefix, true);
+}
+
 

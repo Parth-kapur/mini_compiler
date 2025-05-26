@@ -17,4 +17,3 @@ struct Quad {
 std::vector<Quad> generate3AC(ASTNode* node);
 
 #endif // THREE_ADDRESS_CODE_H
-

@@ -1,79 +1,71 @@
 %{
-#include "parser.tab.h" 
-#include "ast.h"      
-#include <stdio.h>    
-#include <stdlib.h>   
-#include <string.h>   
+#include "ast.h"
+#include "parser.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 %}
 
 %option yylineno
+%option noyywrap
 
 %%
-"if"      { return IF; }
-"else"    { return ELSE; }
-"while"   { return WHILE; }
-"for"     { return FOR; }
-"switch"  { return SWITCH; }
-"case"    { return CASE; }
-"default" { return DEFAULT; }
-"break"   { return BREAK; }
-"=="      { return EQ; }
-"!="      { return NE; }
-"<="      { return LE; }
-">="      { return GE; }
-"<"       { return LT; }
-">"       { return GT; }
-"="       { return ASSIGN; }
-";"       { return SEMICOLON; }
-","       { return COMMA; }
-"{"       { return LBRACE; }
-"}"       { return RBRACE; }
-"("       { return LPAREN; }
-")"       { return RPAREN; }
-":"       { return COLON; }
-"+"       { return PLUS; }
-"-"       { return MINUS; }
-"*"       { return MUL; }
-"/"       { return DIV; }
 
-[0-9]+                      { 
-                                yylval.ival = atoi(yytext); 
-                                return NUMBER; 
-                            }
-[a-zA-Z_][a-zA-Z0-9_]* { 
-                                yylval.sval = strdup(yytext); 
-                                if (yylval.sval == NULL) {
-                                    fprintf(stderr, "DEBUG CRITICAL ERROR: strdup failed for identifier '%s' in lexer (out of memory?). Exiting.\n", yytext);
-                                    fflush(stderr);
-                                    exit(1); 
-                                }
-                                return IDENT; 
-                            }
-[ \t\n]+                    { /* Do nothing, just skip. */ }
-.                           { 
-                                printf("Lexical Error: Unknown character '%s' on line %d\n", yytext, yylineno); 
-                            }
+"if"           { printf("LEX: IF\n"); return IF; }
+"else"         { printf("LEX: ELSE\n"); return ELSE; }
+"while"        { printf("LEX: WHILE\n"); return WHILE; }
+"for"          { printf("LEX: FOR\n"); return FOR; }
+"switch"       { printf("LEX: SWITCH\n"); return SWITCH; }
+"case"         { printf("LEX: CASE\n"); return CASE; }
+"default"      { printf("LEX: DEFAULT\n"); return DEFAULT; }
+"break"        { printf("LEX: BREAK\n"); return BREAK; }
+
+"++"           { printf("LEX: INCR ('%s')\n", yytext); return INCR; }
+"--"           { printf("LEX: DECR ('%s')\n", yytext); return DECR; }
+
+"=="           { printf("LEX: EQ\n"); return EQ; }
+"!="           { printf("LEX: NE\n"); return NE; }
+"<="           { printf("LEX: LE\n"); return LE; }
+">="           { printf("LEX: GE\n"); return GE; }
+"<"            { printf("LEX: LT\n"); return LT; }
+">"            { printf("LEX: GT\n"); return GT; }
+"="            { printf("LEX: ASSIGN\n"); return ASSIGN; }
+
+"+"            { printf("LEX: PLUS ('%s')\n", yytext); return PLUS; }
+"-"            { printf("LEX: MINUS ('%s')\n", yytext); return MINUS; }
+"*"            { printf("LEX: MUL\n"); return MUL; }
+"/"            { printf("LEX: DIV\n"); return DIV; }
+"%"            { printf("LEX: MOD\n"); return MOD; }
+
+";"            { printf("LEX: SEMICOLON\n"); return SEMICOLON; }
+","            { printf("LEX: COMMA\n"); return COMMA; }
+"{"            { printf("LEX: LBRACE\n"); return LBRACE; }
+"}"            { printf("LEX: RBRACE\n"); return RBRACE; }
+"("            { printf("LEX: LPAREN\n"); return LPAREN; }
+")"            { printf("LEX: RPAREN\n"); return RPAREN; }
+":"            { printf("LEX: COLON\n"); return COLON; }
+
+[0-9]+                 {
+                           yylval.ival = atoi(yytext);
+                           printf("LEX: NUMBER ('%s')\n", yytext);
+                           return NUMBER;
+                       }
+
+[a-zA-Z_][a-zA-Z0-9_]*   {
+                           yylval.sval = strdup(yytext);
+                           if (!yylval.sval) {
+                               fprintf(stderr, "CRITICAL ERROR: strdup failed for identifier '%s' in lexer. Exiting.\n", yytext);
+                               exit(1);
+                           }
+                           printf("LEX: IDENT ('%s')\n", yytext);
+                           return IDENT;
+                       }
+
+[ \t\n]+                { /* Ignore whitespace */ }
+
+.                       {
+                           printf("Lexical Error: Unknown character '%s' on line %d\n", yytext, yylineno);
+                       }
+
 %%
-int yywrap() {
-    return 1;
-}
-
-const char* tokenToString(int token) {
-    switch (token) {
-        case IF: return "IF"; case ELSE: return "ELSE"; case WHILE: return "WHILE";
-        case FOR: return "FOR"; case SWITCH: return "SWITCH"; case CASE: return "CASE";
-        case DEFAULT: return "DEFAULT"; case BREAK: return "BREAK"; case EQ: return "EQ";
-        case NE: return "NE"; case LE: return "LE"; case GE: return "GE"; case LT: return "LT";
-        case GT: return "GT"; case ASSIGN: return "ASSIGN"; case SEMICOLON: return "SEMICOLON";
-        case COMMA: return "COMMA"; case LBRACE: return "LBRACE"; case RBRACE: return "RBRACE";
-        case LPAREN: return "LPAREN"; case RPAREN: return "RPAREN"; case COLON: return "COLON";
-        case PLUS: return "PLUS"; case MINUS: return "MINUS"; case MUL: return "MUL";
-        case DIV: return "DIV"; case NUMBER: return "NUMBER"; case IDENT: return "IDENT";
-        case 0: return "EOF"; 
-        default: 
-            static char unknown_token_buffer[30];
-            sprintf(unknown_token_buffer, "UNKNOWN_TOKEN_CODE(%d)", token);
-            return unknown_token_buffer;
-    }
-}
 

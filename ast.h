@@ -2,7 +2,7 @@
 #define AST_H
 
 #include <string>
-#include <iostream> // For std::cout in printAST if used (though printf is used in .cpp)
+#include <iostream>
 
 struct ASTNode {
     std::string type;
@@ -17,7 +17,11 @@ struct ASTNode {
         : type(t), value(v), left(l), right(r), third(th), fourth(f) {}
 };
 
-// Function prototypes for creating different types of AST nodes
+// --- Print AST ---
+void printAST(ASTNode* node, int indent);  // legacy interface
+void printAST(ASTNode* node, const std::string& prefix = "", bool isLast = true);  // tree style
+
+// --- AST node creators ---
 ASTNode* createNumNode(int val);
 ASTNode* createIdNode(char* name);
 ASTNode* createOpNode(const std::string& op, ASTNode* l, ASTNode* r);
@@ -27,10 +31,9 @@ ASTNode* createWhileNode(ASTNode* cond, ASTNode* body);
 ASTNode* createForNode(ASTNode* init, ASTNode* cond, ASTNode* inc, ASTNode* body);
 ASTNode* createSwitchNode(ASTNode* expr, ASTNode* cases);
 ASTNode* createCaseNode(int val, ASTNode* body, ASTNode* next);
-ASTNode* createNode(const std::string& type, ASTNode* left, ASTNode* right); // Generic node creator
-void printAST(ASTNode* root, int indent = 0); // For printing the AST
+ASTNode* createNode(const std::string& type, ASTNode* left, ASTNode* right);
 
-// Global pointer to the root of the AST, declared as extern
+// --- AST root ---
 extern ASTNode* root;
 
 #endif // AST_H
