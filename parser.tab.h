@@ -90,11 +90,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 10 "parser.y"
+#line 18 "parser.y"
 
-	int ival;
-	char* sval;
-	struct ASTNode* node;  // Fixed declaration: use 'struct' keyword
+    int ival;
+    char* sval;
+    struct ASTNode* node;
 
 #line 100 "parser.tab.h"
 
